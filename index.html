@@ -4,30 +4,31 @@
   <meta charset="UTF-8">
   <title>Countdown</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: url("friend.jpg") no-repeat center center fixed;
-      background-size: cover;
-      font-family: Arial, sans-serif;
-    }
-    .timer {
-      font-size: 3em;
-      font-weight: bold;
-      color: white;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-      background: rgba(0, 0, 0, 0.5); /* semi-transparent box */
-      padding: 20px 40px;
-      border-radius: 20px;
-    }
-  </style>
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Background image settings */
+    background: url("friend.jpg") no-repeat center center;
+    background-size: cover;  /* makes it fill the page */
+    background-attachment: fixed; /* keeps it still when scrolling */
+    
+    color: white;
+    font-family: Arial, sans-serif;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+  }
+  .timer {
+    font-size: 3em;
+    font-weight: bold;
+    background: rgba(0,0,0,0.5); /* dark box behind text */
+    padding: 20px;
+    border-radius: 15px;
+  }
+</style>
 </head>
 <body>
   <div class="timer" id="countdown"></div>
@@ -57,3 +58,4 @@
   </script>
 </body>
 </html>
+
