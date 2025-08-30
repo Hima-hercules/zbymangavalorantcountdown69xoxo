@@ -2,61 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Countdown</title>
+  <title>Countdown Celebration Test</title>
   <style>
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    /* Background image settings */
-    background: url("friend.jpg") no-repeat center center;
-    background-size: cover;  /* makes it fill the page */
-    background-attachment: fixed; /* keeps it still when scrolling */
-    
-    color: white;
-    font-family: Arial, sans-serif;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-  }
-  .timer {
-    font-size: 3em;
-    font-weight: bold;
-    background: rgba(0,0,0,0.5); /* dark box behind text */
-    padding: 20px;
-    border-radius: 15px;
-  }
-</style>
+      /* Start with friend.jpg */
+      background: url("friend.jpg") no-repeat center center;
+      background-size: cover;
+      background-attachment: fixed;
+
+      color: white;
+      font-family: Arial, sans-serif;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      overflow: hidden;
+    }
+
+    .timer {
+      font-size: 3em;
+      font-weight: bold;
+      background: rgba(0,0,0,0.5);
+      padding: 20px;
+      border-radius: 15px;
+      z-index: 2;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
-  <div class="timer" id="countdown"></div>
+  <div class="timer" id="timer">5</div>
+  <canvas id="confetti"></canvas>
 
   <script>
-    // Target date: 2025-08-31 04:59:00 Egypt time
-    const targetDate = new Date("2025-08-31T04:59:00+03:00").getTime();
+    let countdown = 5; // test with 5 seconds
+    const timerElement = document.getElementById("timer");
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let confetti = [];
+    let animationFrame;
 
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const diff = targetDate - now;
+    // Resize canvas to full window
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-      if (diff <= 0) {
-        clearInterval(timer);
-        document.getElementById("countdown").innerHTML = "Time's up!";
-        return;
+    // Countdown logic
+    const interval = setInterval(() => {
+      countdown--;
+      timerElement.textContent = countdown;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        timerElement.textContent = "TIME'S UP!";
+        document.body.style.background = "url('celebration.jpg') no-repeat center center";
+        document.body.style.backgroundSize = "cover";
+        startConfetti();
       }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      document.getElementById("countdown").innerHTML =
-        days + "d " + hours + "h " + minutes + "m " + seconds + "s";
     }, 1000);
+
+    // Confetti effect
+    function startConfetti() {
+      for (let i = 0; i < 200; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 10 + 5,
+          color: "hsl(" + Math.random() * 360 + ", 100%, 50%)",
+          tilt: Math.random() * 10 - 10
+        });
+      }
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach((p) => {
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.r, p.r);
+        ctx.fill();
+      });
+      updateConfetti();
+      animationFrame = requestAnimationFrame(animateConfetti);
+    }
+
+    function updateConfetti() {
+      confetti.forEach((p) => {
+        p.y += p.d;
+        p.x += Math.sin(p.y * 0.01);
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+    }
   </script>
 </body>
 </html>
-
-
