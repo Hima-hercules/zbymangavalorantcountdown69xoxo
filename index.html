@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Valorant Countdown</title>
+  <title>Countdown</title>
   <style>
     body {
       margin: 0;
@@ -11,17 +11,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
-
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
       background: url("friend.jpg") no-repeat center center;
       background-size: cover;
-      background-attachment: fixed;
-
-      color: white;
-      font-family: Arial, sans-serif;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
     }
-    .timer {
+    #countdown {
       font-size: 3em;
       font-weight: bold;
       background: rgba(0,0,0,0.5);
@@ -35,96 +31,79 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 9999;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="timer" id="countdown"></div>
+  <div id="countdown"></div>
   <canvas id="confetti"></canvas>
 
   <script>
-    // --- Countdown target ---
-    const countdownElement = document.getElementById("countdown");
-    const targetDate = new Date("2025-08-31T01:59:00Z").getTime(); // UTC time
+    // Target date (2025-08-31 02:00:00 UTC = 5:00 AM Egypt)
+    const targetDate = new Date("2025-08-31T02:00:00Z").getTime();
+
+    const countdownEl = document.getElementById("countdown");
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
 
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = targetDate - now;
 
       if (distance <= 0) {
-        // Change background
-        document.body.style.background = 'url("celebration.jpg") no-repeat center center';
+        document.body.style.background = "url('celebration.jpg') no-repeat center center";
         document.body.style.backgroundSize = "cover";
-
-        // Show celebration text
-        countdownElement.innerHTML = "🎉 Time's Up! 🎉";
-
-        // Trigger confetti
-        startConfetti();
-
-        clearInterval(timer);
+        countdownEl.textContent = "🎉 Time's up! 🎉";
+        canvas.style.display = "block";
+        launchConfetti();
+        clearInterval(interval);
         return;
       }
 
-      // Time calculations
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      countdownElement.innerHTML =
-        days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+      countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
 
-    const timer = setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // --- Confetti effect ---
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let confetti = [];
-
-    function randomColor() {
-      const colors = ["#ff0", "#f0f", "#0ff", "#0f0", "#f00", "#00f"];
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    function createConfetti() {
-      return {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        w: 5 + Math.random() * 5,
-        h: 10 + Math.random() * 10,
-        color: randomColor(),
-        speed: 2 + Math.random() * 3,
-        angle: Math.random() * Math.PI * 2
-      };
-    }
-
-    function startConfetti() {
+    function launchConfetti() {
       for (let i = 0; i < 300; i++) {
-        confetti.push(createConfetti());
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          dx: Math.random() - 0.5,
+          dy: Math.random() * 3 + 2,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`
+        });
       }
       animateConfetti();
     }
 
     function animateConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confetti.forEach((p) => {
-        p.y += p.speed;
-        if (p.y > canvas.height) {
-          p.y = -10;
-          p.x = Math.random() * canvas.width;
-        }
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, p.w, p.h);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx.fillStyle = c.color;
+        ctx.fill();
+        c.x += c.dx;
+        c.y += c.dy;
+        if (c.y > canvas.height) c.y = -10;
       });
       requestAnimationFrame(animateConfetti);
     }
+
+    const interval = setInterval(updateCountdown, 1000);
+    updateCountdown();
   </script>
 </body>
 </html>
